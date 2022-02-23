@@ -1,17 +1,24 @@
 <template>
   <div>
-    <div>Player
-      <video width="400" height="300" controls="controls" poster="../TEST_FOOTAGE/pict/img.png">
-        <source src="../TEST_FOOTAGE/6_1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>
-        <source src="../TEST_FOOTAGE/6_2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-        <source src="../TEST_FOOTAGE/6_3.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+
+    <div class="playersBlock">
+      <player-component :sources="Object.keys(source[leftSourcePlaylist])"/>
+      <video width="400" height="300" >
+        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>
+        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_3.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
         Тег video не поддерживается вашим браузером.
       </video>
-      <img src="../TEST_FOOTAGE/pict/img.png">
+      <video width="400" height="300" >
+        <source src="../TEST_FOOTAGE/blue1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>
+        <source src="../TEST_FOOTAGE/blue2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+        Тег video не поддерживается вашим браузером.
+      </video>
     </div>
-    <div class="playerTools">Settings
-      <div>
+    <div class="playerTools">
+      <div class="sideTools">
         LeftSide
+        <select-playlist :playlists="Object.keys(source)" side="leftSource" @setSidePlaylist="setSidePlaylist"/>
         <div v-for="video in Object.keys(leftSource)" :key="video" class="itemRow">
           <new-scene :source="source[0]"
                      :selected="video"
@@ -35,10 +42,14 @@
 </template>
 
 <script>
-import newScene from "@/components/newScene";
+import newScene from "./components/newScene";
+import SelectPlaylist from "@/components/selectPlaylist";
+import PlayerComponent from "@/components/playerComponent";
 
 export default {
   components: {
+    PlayerComponent,
+    SelectPlaylist,
     newScene
   },
   data() {
@@ -53,12 +64,17 @@ export default {
       rightSource: {},
       fistPlayerCount: 0,
       secondPlayerCount: 0,
+      leftSourcePlaylist: 0,
+      rightSourcePlaylist: 1
     }
   },
   methods: {
+    setSidePlaylist(name, side){
+      this[side + 'Playlist'] = name
+      console.log(this[side + 'Playlist'])
+    },
     addNewVideo(video, side) {
       this[side] = video
-      console.log('00000', this[side])
     }
   },
   name: 'App'
@@ -70,12 +86,19 @@ export default {
   padding: 0;
   margin: 0;
 }
+.playersBlock{
+  display: flex;
+  justify-content: center;
+}
 .itemRow{
   display: flex;
 }
+.playerTools .sideTools{
+  margin: 50px;
+}
 .playerTools {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
 }
 </style>

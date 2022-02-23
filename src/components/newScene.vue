@@ -3,8 +3,8 @@
     <select v-on:change="addSource($event)">
       <option
           v-for="key in Object.keys(source)"
-          :selected="key === this.selected"
-          :disabled="key in this.addedVideo"
+          :selected="key === selected"
+          :disabled="key in addedVideo"
           :key="key"
           class="icon"
           :value="key">{{ key }}
@@ -42,13 +42,11 @@ export default {
       this.$emit('addNewVideo',this.addedVideo, this.side)
     },
   },
-
   data() {
     return {
       addedVideo: {},
       selectedVideo: '',
     }
-
   },
   name: "newScene"
 }
