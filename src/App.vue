@@ -2,18 +2,18 @@
   <div>
 
     <div class="playersBlock">
-      <player-component :sources="Object.keys(source[leftSourcePlaylist])"/>
-      <video width="400" height="300" >
-        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>
-        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_3.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-        Тег video не поддерживается вашим браузером.
-      </video>
-      <video width="400" height="300" >
-        <source src="../TEST_FOOTAGE/blue1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>
-        <source src="../TEST_FOOTAGE/blue2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-        Тег video не поддерживается вашим браузером.
-      </video>
+      <player-component :sources="Object.keys(source[leftSourcePlaylist])" id="leftPlayer"/>
+<!--      <video width="400" height="300" >-->
+<!--        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>-->
+<!--        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>-->
+<!--        <source src="https://disk.yandex.ru/d/-qWLklHPXAFONw/6_3.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>-->
+<!--        Тег video не поддерживается вашим браузером.-->
+<!--      </video>-->
+<!--      <video width="400" height="300" >-->
+<!--        <source src="../TEST_FOOTAGE/blue1.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>-->
+<!--        <source src="../TEST_FOOTAGE/blue2.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>-->
+<!--        Тег video не поддерживается вашим браузером.-->
+<!--      </video>-->
     </div>
     <div class="playerTools">
       <div class="sideTools">
@@ -55,9 +55,11 @@ export default {
   data() {
     return {
       source: {
-        0: {'------': {}, '6_1.mp4': {img: 'img.png'}, '6_2.mp4': {img: 'img_1.png'}, '6_3.mp4': {img: 'img_2.png'}},
-        1: {'blue1.mp4': {img: 'img_2.png'}, 'blue2.mp4': {img: 'img_3.png'}},
-        2: {'green1.mp4': {img: 'img_4.png'}, 'green2.mp4': {img: 'img_5.png'}},
+        0: {'------': {}, '6_1.mp4': {img: 'img.png'},  '6_6.mp4': {img: 'img.png'}, 'id':'empty'},
+        // 0: {'------': {}, '6_1.mp4': {img: 'img.png'}, '6_2.mp4': {img: 'img_1.png'}, '6_3.mp4': {img: 'img_2.png'}},
+        // 1: {'blue1.mp4': {img: 'img_2.png'}, 'blue2.mp4': {img: 'img_3.png'}},
+        1: {'------': {}, '6_6.mp4': {img: 'img.png'}},
+        // 2: {'green1.mp4': {img: 'img_4.png'}, 'green2.mp4': {img: 'img_5.png'}},
       },
 
       leftSource: {},
