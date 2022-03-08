@@ -1,12 +1,14 @@
 <template>
-  <div v-for="(item, index) in playlists" :key="item">
-    <input type="radio"
-           :name="side"
-           :value="item"
-           :checked="side == 'leftSource' && index == 0"
-           :id="item + '_playlist'"
-           @change="onChange($event)"/>
-    <label :for="item + '_playlist'">{{ item }}</label>
+  <div class="selectPlaylistBlock">
+    <h4>Выберете плейлист</h4>
+    <div v-for="(item, index) in playlists" :key="item" class="selectPlaylistItem">
+      <input type="radio"
+             :value="index"
+             :checked="index == checked"
+             :id="item + '_playlist'"
+             @change="onChange($event)"/>
+      <label :for="item + '_playlist'">{{ item }}</label>
+    </div>
   </div>
 </template>
 
@@ -18,11 +20,14 @@ export default {
     },
     side: {
       type: String
+    },
+    checked:{
+      type: Number
     }
   },
   methods: {
     onChange(event) {
-      this.$emit('setSidePlaylist', event.target.value, this.side)
+      this.$emit('setSideSelectOptions', event.target.value, this.side)
     }
   },
   name: "selectPlaylist"
@@ -31,5 +36,7 @@ export default {
 </script>
 
 <style scoped>
+.selectPlaylistBlock{
 
+}
 </style>
