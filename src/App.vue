@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="playersBlock">
+    <div class="playersBlock" :ref="'playersBlock'">
       <player-component :source="this.leftSource ? this.leftSource : 'unknown'" id="leftPlayer"
                         @nextTrack="nextTrack"/>
       <player-component :source="this.rightSource? this.rightSource : 'unknown'" id="rightPlayer"/>
@@ -28,6 +28,7 @@
                             @setPlaylist="setPlaylist"
                             @deleteItemPlaylist="deleteItemPlaylist"
                             side="left"
+                            :url="url"
                             :selectedOptions="leftPlaylist"/>
         </div>
         <div class="leftSide">
@@ -37,6 +38,7 @@
                            :checked="rightCheckedPlaylist"/>
           <playlist-builder :selectOptions="rightSelectOptions"
                             @setPlaylist="setPlaylist"
+                            :url="url"
                             @deleteItemPlaylist="deleteItemPlaylist"
                             side="right"
                             :selectedOptions="rightPlaylist"/>
@@ -44,9 +46,13 @@
       </div>
       <div>
       </div>
-      <button v-if="rightPlaylist.length > 0 &&  leftPlaylist.length > 0" @click="saveConfig">save</button>
-      <button v-if="rightPlaylist.length > 0 &&  leftPlaylist.length > 0" @click="discardConfig">discard</button>
+
     </div>
+    <div class="bottomButtons">
+      <button @click="saveConfig">save</button>
+      <button @click="setDefaults">discard</button>
+    </div>
+
   </div>
 
 </template>
@@ -62,21 +68,25 @@ export default {
     PlayerComponent,
     SelectPlaylist,
   },
+  mounted: function () {
+    this.$nextTick(function () {
+      this.setDefaults()
+    })
+  },
   data() {
     return {
-      isActive: false,
       url: 'https://www.murmuriki.ru/footage/',
       source: {
-        0: {'6_1.mp4': {img: 'img.png'}, '6_6.mp4': {img: 'img.png'}},
-        1: {'blue1.mp4': {img: 'img_2.png'}, 'blue2.mp4': {img: 'img_3.png'}},
-        2: {'green1.mp4': {img: 'img_4.png'}, 'green2.mp4': {img: 'img_5.png'}},
+        'one': ['6_1', '6_2', '6_4', '6_3'],
+        'two': ['blue1', 'blue2', 'blue3', 'blue4'],
+        'tree': ['green1', 'green2', 'green3', 'green4'],
       },
       leftIndexSource: 0,
       rightIndexSource: 0,
       rightCheckedPlaylist: 1,
       leftCheckedPlaylist: 0,
-      rightSelectOptions: {'blue1.mp4': {img: 'img_2.png'}, 'blue2.mp4': {img: 'img_3.png'}},
-      leftSelectOptions: {'6_1.mp4': {img: 'img.png'}, '6_6.mp4': {img: 'img.png'}},
+      rightSelectOptions: [],
+      leftSelectOptions: [],
       visiblePlaylistsTool: true,
       rightPlaylist: [],
       leftPlaylist: [],
@@ -85,20 +95,38 @@ export default {
     }
   },
   methods: {
-    saveConfig() {
-      let players = this.getNodes('Player')
-      console.log(this.leftPlaylist)
-      console.log(this.rightPlaylist)
-      this.leftSource = this.url + this.leftPlaylist[0]
-      this.rightSource = this.url + this.rightPlaylist[0]
-      players[0].load();
-      players[1].load();
+    setDefaults() {
+      this.leftIndexSource = 0
+      this.rightIndexSource = 0
+      this.rightCheckedPlaylist = 1
+      this.leftCheckedPlaylist = 0
+      let rightSelectOptions = this.source[Object.keys(this.source)[1]]
+      let leftSelectOptions = this.source[Object.keys(this.source)[0]]
+      this.rightPlaylist = [rightSelectOptions[0]]
+      this.leftPlaylist = [leftSelectOptions[0]]
+      this.rightSelectOptions = rightSelectOptions
+      this.leftSelectOptions = leftSelectOptions
+      this.saveConfig()
     },
-    discardConfig() {
-      this.leftSource = []
-      this.rightSource = []
-      this.rightPlaylist = []
-      this.leftPlaylist = []
+    saveConfig() {
+     if(this.checkPlaylists()) {
+       let players = this.getNodes('Player')
+       this.leftSource = this.url + this.leftPlaylist[0] + '.mp4'
+       this.rightSource = this.url + this.rightPlaylist[0] + '.mp4'
+       players[0].load();
+       players[1].load();
+     } else {
+       this.showError();
+     }
+    },
+    checkPlaylists(){
+      if(this.leftPlaylist.includes(null) || this.rightPlaylist.includes(null)){
+        return false
+      }
+      return true
+    },
+    showError(){
+      alert('Остались блоки с невыбранными эпизодами. Удалите их или выберете эпизоды')
     },
     setPlaylist(value, side) {
       this[side + 'Playlist'] = value;
@@ -111,15 +139,15 @@ export default {
     },
     changeSource(next) {
       if (next) {
-        this.leftIndexSource = this.leftIndexSource == this.leftPlaylist.length - 1 ? 0 : this.leftIndexSource + 1
-        this.rightIndexSource = this.rightIndexSource == this.rightPlaylist.length - 1 ? 0 : this.rightIndexSource + 1
+        this.leftIndexSource = this.leftIndexSource === this.leftPlaylist.length - 1 ? 0 : this.leftIndexSource + 1
+        this.rightIndexSource = this.rightIndexSource === this.rightPlaylist.length - 1 ? 0 : this.rightIndexSource + 1
       } else {
         this.leftIndexSource > 0 ? this.leftIndexSource-- : null
         this.rightIndexSource > 0 ? this.rightIndexSource-- : null
       }
     },
     nextPlay(player, side) {
-      player.src = this.url + this[side + 'Playlist'][this[side + 'IndexSource']]
+      player.src = this.url + this[side + 'Playlist'][this[side + 'IndexSource']] + '.mp4'
       player.load();
       player.play();
     },
@@ -178,15 +206,19 @@ export default {
           this.leftPlaylist = [],
           value = Number(value);
       let selectedSide = side + 'CheckedPlaylist'
-      let different = side === 'left' ? 'right' : 'left'
-      let differentSide = different + 'CheckedPlaylist'
+      let differentSide = side === 'left' ? 'right' : 'left'
+      let selectedDifferentSide = differentSide + 'CheckedPlaylist'
       this[selectedSide] = value
-      if (this[differentSide] === value) {
-        this[differentSide] = this[differentSide] < Object.keys(this.source).length - 1 ?
+      if (this[selectedDifferentSide] === value) {
+        this[selectedDifferentSide] = this[selectedDifferentSide] < Object.keys(this.source).length - 1 ?
             value + 1 : value - 1
       }
       this[side + 'SelectOptions'] = this.source[Object.keys(this.source)[value]]
-      this[different + 'SelectOptions'] = this.source[Object.keys(this.source)[this[differentSide]]]
+      this[differentSide + 'SelectOptions'] = this.source[Object.keys(this.source)[this[selectedDifferentSide]]]
+      this[side + 'Playlist'] = ['this']
+      this[side + 'Playlist'] = [this[side + 'SelectOptions'][0]]
+      this[differentSide + 'Playlist'] = [this[differentSide + 'SelectOptions'][0]]
+      this.saveConfig()
     },
     addNewVideo(video, side) {
       this[side] = video
@@ -202,10 +234,23 @@ export default {
   margin: 0;
 }
 
+h4 {
+  margin: 20px 10px;
+}
+
 .sideTools {
   display: flex;
   justify-content: space-between;
   width: 50%;
+}
+
+.bottomButtons {
+  display: flex;
+  justify-content: end;
+}
+
+button {
+  margin: 10px;
 }
 
 .selectPlaylistItem, select {
@@ -248,4 +293,31 @@ label {
   justify-content: center;
   align-items: center;
 }
+
+.tip,
+span.support::before {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  top: 20px;
+  left: 0;
+  background: #EDEDED;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  box-shadow: 5px 5px 0.5em -0.1em rgba(0, 0, 6, 0.5);
+  text-align: left;
+  color: #000;
+  font: normal 500 14px Arial, sans-serif;
+  cursor: default;
+  padding: 5px;
+  width: 150px;
+  min-height: 50px;
+  height: auto;
+}
+
+a.support:focus .tip {
+  display: block;
+}
+
+
 </style>

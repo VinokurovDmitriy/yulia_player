@@ -1,61 +1,68 @@
 <template>
   <div>
-    <h4>Выберете ролики</h4>
-    <div v-for="(option, index) of this.selected"
-         :key="index">
-      <select @change="selectVideo($event, index)" :id="index">
-        <option
-            v-for="(option, index) of Object.keys(this.selectOptions)"
-            :key="index">{{ option }}
-        </option>
-      </select>
-      <button @click="deleteItem($event)" :id="this.side + 'Position_' + index">-</button>
+    <h4>Добавьте эпизод</h4>
+    <div v-for="(option, indexSelect) in  selected" :key="option">
+      <a :ref="side + 'Select_' + indexSelect" class='support'
+         tabindex="1">{{ this.selected[indexSelect] ? this.selected[indexSelect] : 'Выберете эпизод' }}
+        <span class='tip'>
+          <select-source :source="selectOptions"
+                         :url="url"
+                         :selectId="indexSelect"
+                         @selectItem="selectItem"/>
+ </span>
+      </a>
+      <button v-if="indexSelect === selectedOptions.length - 1 && selectOptions.length !== selected.length"
+              @click="addItem($event)">+</button>
+      <button v-if="indexSelect > 0" @click="deleteItem($event)" :id="this.side + 'Position_' + indexSelect">-</button>
     </div>
-    <select v-if="Object.keys(this.selectOptions).length > Object.keys(this.selectedOptions).length"
-            @change="selectVideo($event)">
-      <option
-          :id="option == ''"
-          :selected="false"
-          v-for="(option, index) of Object.keys({'': '', ...this.selectOptions})"
-          :key="index">{{ option }}
-      </option>
-    </select>
-
   </div>
 </template>
 
 <script>
+import SelectSource from "@/components/selectSource";
+
 export default {
+  components: {
+    SelectSource
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      this.selected = this.selectedOptions
+    })
+  },
   data() {
     return {
       selected: this.selectedOptions
     }
   },
   props: {
+    url: {
+      type: String
+    },
     selectOptions: {
-      type: Object
+      type: Array
     },
     selectedOptions: {
-      type: Object
+      type: Array
     },
     side: {
       type: String
     },
   },
-  methods: {
-    selectVideo(event, position = null) {
-      console.log('selected', this.selected)
-      position !== null ? this.selected[position] = event.target.value : this.selected.push(event.target.value)
-      if (event.target.value != '') {
-        this.$emit('setPlaylist', this.selected, this.side)
-      }
-    },
 
+  methods: {
+    selectItem(selectId, name) {
+       this.selected[selectId] = name;
+        this.$emit('setPlaylist', this.selected, this.side)
+      this.$refs[this.side +'Select_' + selectId][0].blur()
+    },
     deleteItem(event) {
       let position = event.target.id.split('_')[1]
-      let result = this.selected.splice(position, 1)
-      this.$emit('setPlaylist', result, this.side)
-      console.log('selected', this.selected)
+      this.selected.splice(position, 1)
+      this.$emit('setPlaylist', this.selected, this.side)
+    },
+    addItem() {
+      this.selected.push(null)
     }
   },
   name: "playlistBuilder"
@@ -63,5 +70,13 @@ export default {
 </script>
 
 <style scoped>
-
+.support {
+  width: 200px;
+  padding: 3px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+}
 </style>

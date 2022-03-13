@@ -3,6 +3,7 @@
     <h4>Выберете плейлист</h4>
     <div v-for="(item, index) in playlists" :key="item" class="selectPlaylistItem">
       <input type="radio"
+             :name="side"
              :value="index"
              :checked="index == checked"
              :id="item + '_playlist'"
