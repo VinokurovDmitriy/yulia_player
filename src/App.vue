@@ -69,9 +69,7 @@ export default {
     SelectPlaylist,
   },
   mounted: function () {
-    this.$nextTick(function () {
-      this.setDefaults()
-    })
+    this.setDefaults()
   },
   data() {
     return {

@@ -26,6 +26,7 @@ export default {
     SelectSource
   },
   mounted: function () {
+    console.log('222222222222', this.selected, this.selectedOptions)
     this.$nextTick(function () {
       this.selected = this.selectedOptions
     })

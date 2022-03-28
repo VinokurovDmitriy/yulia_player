@@ -1,6 +1,6 @@
 <template>
   <div class="playerContainer">
-  <video :id="id" @ended="nextSource"  onloadstart="this.volume=0">
+  <video :id="id" @ended="nextSource"  onloadstart="this.volume=0" preload='auto'>
     <source
         :src="source"
         type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'>
